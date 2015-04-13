@@ -26,7 +26,10 @@ automatically pulled.
 If you want, you can also set a few other environment variables: `APP_PORT`,
 `APP_STORE_PATH` (where your files are stored; `/var/www` by default), and
 `APP_RELOAD_PATH` (the special URL that causes SimpleFileDrop to update based on
-your archive).
+your archive; `/reload_now` by default).
+
+If you want to host your files on a subdomain, see
+[this StackOverflow answer](http://stackoverflow.com/a/23975934/832776).
 
 Usage
 -----
@@ -36,3 +39,7 @@ file drop.
 
 Whenever you need to update your server, simply update the archive on your
 Dropbox or Google Drive folder, and revisit the reload URL!
+
+You can access the logs this way (replace `<container>` based on the ID from `docker ps`):
+
+    docker exec <container> less +F /tmp/http.log
