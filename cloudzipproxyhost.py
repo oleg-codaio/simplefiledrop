@@ -49,8 +49,8 @@ class CloudZipProxyHost(SimpleHTTPRequestHandler):
 
             try:
                 # Download ZIP.
-                self.wfile.write(('<html><body><ul><li><b>Downloading ZIP file...'
-                                  '</b></li>'))
+                self.wfile.write(('<html><body><ul><li><b>Downloading ZIP file'
+                                  '...</b></li>'))
                 zipfile = ZipFile(StringIO(urlopen(ARCHIVE_URL).read()))
 
                 # Clear out directory.
@@ -63,7 +63,8 @@ class CloudZipProxyHost(SimpleHTTPRequestHandler):
                     self.wfile.write('<li>Extracting %s</li>' % file)
                     zipfile.extract(file, STORE_PATH)
             except:
-                self.wfile.write('<li><b>Error:</b><pre><code>%s</code></pre></li>' \
+                self.wfile.write(('<li><b>Error:</b><pre><code>%s</code></pre>'
+                                  '</li>') \
                     % traceback.format_exc())
             else:
                 self.wfile.write('<li><a href="/"><b><i>Done!</i></b></a></li>')

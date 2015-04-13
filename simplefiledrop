@@ -1,4 +1,4 @@
 #!/bin/sh
 
-exec /usr/local/bin/cloudzipproxyhost.py >> /tmp/http.log
+exec /usr/local/bin/cloudzipproxyhost.py >> /tmp/http.log 2>&1
 
