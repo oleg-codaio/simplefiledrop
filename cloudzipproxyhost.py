@@ -8,6 +8,7 @@
 import os
 import shutil
 import SocketServer
+import traceback
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from StringIO import StringIO
 from urllib import urlopen
@@ -18,9 +19,20 @@ STORE_PATH = os.getenv('APP_STORE_PATH', '/var/www')
 RELOAD_URL = os.getenv('APP_RELOAD_PATH', '/reload_now')
 ARCHIVE_URL = os.getenv('APP_ARCHIVE_URL', None)
 
-class GDriveZipProxyHost(SimpleHTTPRequestHandler):
+class CloudZipProxyHost(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
         SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
+
+    def clearDirContents(self, path):
+        if os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            for child in os.listdir(path):
+                childPath = os.path.join(path, child)
+                if os.path.isfile(childPath):
+                    os.remove(childPath)
+                elif os.path.isdir(childPath):
+                    shutil.rmtree(childPath)
 
     def reloadFromDrive(self):
         if not ARCHIVE_URL:
@@ -35,26 +47,28 @@ class GDriveZipProxyHost(SimpleHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-            # Download ZIP.
-            self.wfile.write(('<html><body><ol><li><b>Downloading ZIP from '
-                              'Google Drive...</b></li>'))
-            zipfile = ZipFile(StringIO(urlopen(ARCHIVE_URL).read()))
+            try:
+                # Download ZIP.
+                self.wfile.write(('<html><body><ul><li><b>Downloading ZIP file...'
+                                  '</b></li>'))
+                zipfile = ZipFile(StringIO(urlopen(ARCHIVE_URL).read()))
 
-            # Clear out directory.
-            self.wfile.write('<li><b>Clearing directory...</b></li>')
-            # TODO: Don't be lazy; preserve the original directory.
-            shutil.rmtree(STORE_PATH)
-            os.makedirs(STORE_PATH)
+                # Clear out directory.
+                self.wfile.write('<li><b>Clearing directory...</b></li>')
+                self.clearDirContents(PATH)
 
-            # Extract all the files in it.
-            self.wfile.write('<li><b>Extracting ZIP...</b></li>')
-            for file in zipfile.namelist():
-                self.wfile.write('<li>Extracting %s</li>' % file)
-                zipfile.extract(file, STORE_PATH)
+                # Extract all the files in it.
+                self.wfile.write('<li><b>Extracting ZIP...</b></li>')
+                for file in zipfile.namelist():
+                    self.wfile.write('<li>Extracting %s</li>' % file)
+                    zipfile.extract(file, STORE_PATH)
+            except:
+                self.wfile.write('<li><b>Error:</b><pre><code>%s</code></pre></li>' \
+                    % traceback.format_exc())
+            else:
+                self.wfile.write('<li><a href="/"><b><i>Done!</i></b></a></li>')
 
-            # Done!
-            self.wfile.write('<li><a href="/"><b><i>Done!</i></b></a></li>')
-            self.wfile.write('</ol></body></html>')
+            self.wfile.write('</ul></body></html>')
 
     def do_GET(self):
         if self.path == RELOAD_URL:
@@ -66,7 +80,8 @@ class GDriveZipProxyHost(SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     os.chdir(STORE_PATH)
-    httpd = SocketServer.TCPServer(('', PORT), GDriveZipProxyHost)
-    print 'GDriveZipProxyHost is running on port %d. Use \'%s\' to reload.' % (PORT, RELOAD_URL)
+    httpd = SocketServer.TCPServer(('', PORT), CloudZipProxyHost)
+    print 'SimpleFileDrop is running on port %d. Use \'%s\' to reload.' \
+        % (PORT, RELOAD_URL)
     httpd.serve_forever()
 

@@ -1,5 +1,5 @@
 # Lightweight Docker container for hosting files: mirrors the contents of a ZIP
-# file in your Dropbox or Google Drive.
+# file in your Dropbox or Google Drive (or anywhere else, for that matter).
 
 FROM phusion/baseimage:0.9.16
 MAINTAINER olegv
