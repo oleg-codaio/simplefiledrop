@@ -55,7 +55,7 @@ class CloudZipProxyHost(SimpleHTTPRequestHandler):
 
                 # Clear out directory.
                 self.wfile.write('<li><b>Clearing directory...</b></li>')
-                self.clearDirContents(PATH)
+                self.clearDirContents(STORE_PATH)
 
                 # Extract all the files in it.
                 self.wfile.write('<li><b>Extracting ZIP...</b></li>')
