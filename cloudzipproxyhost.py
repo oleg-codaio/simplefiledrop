@@ -3,7 +3,7 @@
 # Simple HTTP server that also provides a way to update its contents with that
 # of some publicly-accessible ZIP file hosted on Dropbox or Google Drive.
 #
-# Author: me@olegvaskevich.com (Oleg Vaskevich)
+# Author: oleg@osv.im (Oleg Vaskevich)
 
 import os
 import shutil
