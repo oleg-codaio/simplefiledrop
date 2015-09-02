@@ -22,6 +22,7 @@ ARCHIVE_URL = os.getenv('APP_ARCHIVE_URL', None)
 class CloudZipProxyHost(SimpleHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
         SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
+        self.extensions_map[''] = 'text/plain'
 
     def clearDirContents(self, path):
         if os.path.isfile(path):
